@@ -61,4 +61,7 @@ if __name__ == '__main__':
     mines = int(args.mines) if args.mines is not None else 99
 
     while True:
-        play_game(dims, mines)
+        try:
+            key = play_game(dims, mines)
+        except (Exception, KeyboardInterrupt):
+            break

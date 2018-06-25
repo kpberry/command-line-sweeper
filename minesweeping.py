@@ -6,7 +6,8 @@ from scipy.signal import convolve
 
 
 def gen_board(dims, mines):
-    # Randomly places mines on a board by shuffling a list of mines and not mines
+    # Randomly places mines on a board by shuffling a list of mines and not
+    # mines
     board = np.concatenate([np.zeros(np.prod(dims) - mines), np.ones(mines)])
     np.random.shuffle(board)
     return board.reshape(dims)

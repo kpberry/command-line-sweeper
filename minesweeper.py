@@ -39,13 +39,12 @@ def display_screen(screen_string, screen, colors, offset_x=0, offset_y=0):
         cur_x = offset_x
 
 
-def play_game(dims, mines):
+def play_game(dims, mines, screen):
     board = gen_board(dims, mines)
     counts = get_mine_counts(board)
     known = np.ones(dims) * -1
     flags = np.zeros(dims)
 
-    screen = curses.initscr()
     screen.keypad(True)
     curses.start_color()
     curses.init_pair(1, curses.COLOR_BLUE, curses.COLOR_BLACK)
@@ -81,8 +80,8 @@ def play_game(dims, mines):
         screen.clear()
         display_screen(get_known_string(known, flags), screen,
                        colors, offset[0], offset[1])
-        screen.addstr(0, 0,
-                      'Press q to quit, ENTER to select a square, and f to flag a mine.',
+        screen.addstr(0, 0, 'Press q to quit, ENTER to select a '
+                      + 'square, and f to flag a mine.',
                       curses.A_BOLD)
         screen.move(y + offset[1], x + offset[0])
         key = chr(screen.getch())
@@ -92,9 +91,11 @@ def play_game(dims, mines):
             y += 1
         elif (key == 'a' or ord(key) == curses.KEY_LEFT) and x > 0:
             x -= 2
-        elif (key == 'd' or ord(key) == curses.KEY_RIGHT) and x < (dims[1] - 1) * 2:
+        elif (key == 'd' or ord(key) == curses.KEY_RIGHT) \
+                and x < (dims[1] - 1) * 2:
             x += 2
-        elif key == 'f' and (known[y, int(x / 2)] < 0 or flags[y, int(x / 2)] > 0):
+        elif key == 'f' \
+                and (known[y, int(x / 2)] < 0 or flags[y, int(x / 2)] > 0):
             flags[y, int(x / 2)] = 1 - flags[y, int(x / 2)]
         elif key == '\n' and not flags[y, int(x / 2)]:
             safe = select([int(y), int(x / 2)], board, counts, known)
@@ -102,8 +103,8 @@ def play_game(dims, mines):
                 screen.clear()
                 display_screen(get_game_over_string(
                     board, counts), screen, colors, offset[0], offset[1])
-                screen.addstr(
-                    0, 0, 'You lose! Press ENTER to play again.', curses.A_BOLD)
+                screen.addstr(0, 0, 'You lose! Press ENTER to play again.',
+                              curses.A_BOLD)
                 screen.getch()
                 break
             elif np.sum(known == -1) == mines:
@@ -115,7 +116,6 @@ def play_game(dims, mines):
                 screen.getch()
                 break
         screen.refresh()
-    curses.endwin()
     return key
 
 
@@ -131,4 +131,10 @@ if __name__ == '__main__':
 
     key = ''
     while key != 'q':
-        key = play_game(dims, mines)
+        try:
+            screen = curses.initscr()
+            key = play_game(dims, mines, screen)
+            curses.endwin()
+        except (Exception, KeyboardInterrupt):
+            curses.endwin()
+            break
