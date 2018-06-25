@@ -2,6 +2,7 @@ from minesweeping import gen_board, get_mine_counts, select
 import numpy as np
 import curses
 import re
+import argparse
 
 
 def get_known_string(known, flags):
@@ -119,6 +120,15 @@ def play_game(dims, mines):
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser(
+        description="Plays minesweeper on arbitray n-dimensional grids")
+    parser.add_argument('-d', '--dims', nargs='+', help='List of dimensions')
+    parser.add_argument('-m', '--mines', help='Number of mines')
+
+    args = parser.parse_args()
+    dims = tuple(map(int, args.dims)) if args.dims is not None else [16, 30]
+    mines = int(args.mines) if args.mines is not None else 99
+
     key = ''
     while key != 'q':
-        key = play_game([16, 30], 99)
+        key = play_game(dims, mines)

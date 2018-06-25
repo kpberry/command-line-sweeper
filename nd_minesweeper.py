@@ -39,12 +39,12 @@ def play_game(dims, mines):
             indices = map(int, indices.split())
             safe = select(indices, board, counts, known)
             if not safe:
-                print('You lose!')
                 print_game_over(board, counts)
+                input('You lose! Press ENTER to play again. ')
                 break
             elif np.sum(known == -1) == mines:
-                print('You win!')
                 print_game_over(board, counts)
+                input('You win! Press ENTER to play again. ')
                 break
         except Exception:
             pass
@@ -57,6 +57,8 @@ if __name__ == '__main__':
     parser.add_argument('-m', '--mines', help='Number of mines')
 
     args = parser.parse_args()
-    dims = tuple(map(int, args.dims)) or [16, 30]
-    mines = args.mines or 10
-    play_game(dims, 10)
+    dims = tuple(map(int, args.dims)) if args.dims is not None else [16, 30]
+    mines = int(args.mines) if args.mines is not None else 99
+
+    while True:
+        play_game(dims, mines)
