@@ -1,5 +1,6 @@
 import os
 import re
+import argparse
 
 import numpy as np
 from minesweeping import get_mine_counts, gen_board, select
@@ -45,9 +46,17 @@ def play_game(dims, mines):
                 print('You win!')
                 print_game_over(board, counts)
                 break
-        except:
+        except Exception:
             pass
 
 
 if __name__ == '__main__':
-    play_game([16, 30, 2], 10)
+    parser = argparse.ArgumentParser(
+        description="Plays minesweeper on arbitray n-dimensional grids")
+    parser.add_argument('-d', '--dims', nargs='+', help='List of dimensions')
+    parser.add_argument('-m', '--mines', help='Number of mines')
+
+    args = parser.parse_args()
+    dims = tuple(map(int, args.dims)) or [16, 30]
+    mines = args.mines or 10
+    play_game(dims, 10)
