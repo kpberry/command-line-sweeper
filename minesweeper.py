@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 from minesweeping import gen_board, get_mine_counts, select
 import numpy as np
 import curses
