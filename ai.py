@@ -5,12 +5,12 @@ from random import choice
 import argparse
 
 
-def select_random_unknown_index(known, marked):
+def get_random_unknown_index(known, marked):
     unknown = (known < 0) & (marked < 1)
     return choice(np.transpose(np.nonzero(unknown)).tolist())
 
 
-def select_safe_indices(known, marked):
+def get_safe_indices(known, marked):
     marked_counts = get_neighbor_counts(marked)
     satisfied = (marked_counts == known) & (known > 0)
     safe_indices = get_neighbor_counts(satisfied) * (known < 0) * (marked < 1)
@@ -29,31 +29,33 @@ def solve(board, serial=False):
     known = np.ones(dims) * -1
     marked = np.zeros(known.shape)
 
-    prev_known, prev_marked = None, None
     turns = 0
     while True:
         turns += 1
-        if np.sum(prev_known) == np.sum(known)\
-                and np.sum(prev_marked) == np.sum(marked):
-            index = select_random_unknown_index(known, marked)
+
+        indices = get_safe_indices(known, marked)
+        if len(indices) > 0:
+            if serial:
+                safe = select(indices[0], board, counts, known)
+                assert safe
+            else:
+                for index in indices:
+                    safe = select(index, board, counts, known)
+                    assert safe
+        else:
+            index = get_random_unknown_index(known, marked)
             safe = select(index, board, counts, known)
             if not safe:
                 print('You lose! (random selection)')
                 return False
-        prev_known = known.copy()
-        prev_marked = marked.copy()
+
         mark_mines(known, marked)
-        indices = select_safe_indices(known, marked)
-        if serial:
-            if len(indices) > 0:
-                safe = select(indices[0], board, counts, known)
-        else:
-            for index in indices:
-                safe = select(index, board, counts, known)
-                assert safe
+
         print_known(known, marked=marked)
-        assert np.sum((known > 0) * board) == 0
         print(np.sum(marked))
+        print('-' * 80)
+        assert np.sum((known > 0) * board) == 0
+
         if np.sum(board) == np.sum(marked):
             assert np.sum(board * marked) == np.sum(board)
             print('Game won in {} turns!'.format(turns))
@@ -77,6 +79,7 @@ if __name__ == '__main__':
     if until_win:
         tries = 1
         while not solve(gen_board(dims, mines), serial=serial):
+            print('=' * 80)
             tries += 1
         print('Game won in {} tries.'.format(tries))
     else:
