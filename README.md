@@ -1,5 +1,5 @@
 # command-line-sweeper
-Command line minesweeper with as few loops as possible
+Command line minesweeper with as few loops as possible.  
 Name credits: [Jim Harris](http://jh456.github.io/)
 
 # Running
