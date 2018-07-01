@@ -13,7 +13,7 @@ def gen_board(dims, mines):
     return board.reshape(dims)
 
 
-def get_mine_counts(board):
+def get_neighbor_counts(board):
     # Gets the count of mines in all cells' neighbors by using an n-dimensional
     # convolution with a unit tensor in the appropriate dimension
     kernel = np.ones([3] * len(board.shape))
@@ -38,6 +38,7 @@ def select(index, board, counts, known):
         connected_components = label(1 - (counts > 0), structure=kernel)[0]
         empty_mask = connected_components == connected_components[index]
         dims = list(map(lambda d: slice(1, d + 1), board.shape))
-        full_mask = convolve(kernel, 1 * empty_mask)[dims] > 0
-        known[full_mask] = counts[full_mask]
+        new_known = convolve(kernel, 1 * empty_mask)[dims]
+        known_mask = np.round(np.abs(new_known)) > 0
+        known[known_mask] = counts[known_mask]
         return True

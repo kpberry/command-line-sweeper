@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from minesweeping import gen_board, get_mine_counts, select
+from minesweeping import gen_board, get_neighbor_counts, select
 import numpy as np
 import curses
 import re
@@ -42,7 +42,7 @@ def display_screen(screen_string, screen, colors, offset_x=0, offset_y=0):
 
 def play_game(dims, mines, screen):
     board = gen_board(dims, mines)
-    counts = get_mine_counts(board)
+    counts = get_neighbor_counts(board)
     known = np.ones(dims) * -1
     flags = np.zeros(dims)
 
@@ -127,8 +127,8 @@ if __name__ == '__main__':
     parser.add_argument('-m', '--mines', help='Number of mines')
 
     args = parser.parse_args()
-    dims = tuple(map(int, args.dims)) if args.dims is not None else [16, 30]
-    mines = int(args.mines) if args.mines is not None else 99
+    dims = tuple(map(int, args.dims)) if args.dims else [16, 30]
+    mines = int(args.mines) if args.mines else 99
 
     key = ''
     while key != 'q':
